@@ -1,0 +1,365 @@
+from pysquares import *
+import numpy as np
+def pad_test():
+    print("\n\nTEST: padding shapes\n")
+    print("full")
+    full_arr = np.array([[1, 2, 3], [4, 5, 6]])
+    padded_full_arr = pad(full_arr)
+    print(full_arr)
+    print(padded_full_arr)
+    print("pad again")
+    double_padded_full_arr = pad(padded_full_arr)
+    print(double_padded_full_arr)
+
+    print("\nempty")
+    empty_arr = np.array([[0, 0, 0], [0, 0, 0]])
+    padded_empty_arr = pad(empty_arr)
+    print(empty_arr)
+    print(padded_empty_arr)
+
+    print("\nsingle empty cell")
+    a = np.array([[0]])
+    b = pad(a)
+    print(a)
+    print(b)
+
+    print("\nsingle full cell")
+    a = np.array([[1]])
+    b = pad(a)
+    print(a)
+    print(b)
+
+def validate_shape_test():
+    print("\n\nTEST: Validating shapes\n")
+    print("single cell")
+    a = np.array([[1]])
+    print(a)
+    print(validate_shape(a))
+
+    print("\nkitty corner")
+    a = np.array([[0,0,0,0],
+                  [0,1,0,0],
+                  [0,0,1,0],
+                  [0,0,0,0],])
+    print(a)
+    print(validate_shape(a))
+
+    print("\nlarger shape")
+    a = np.array([[0,0,0,0,0],
+                  [0,1,1,1,0],
+                  [0,0,1,0,0],
+                  [0,0,0,0,0]])
+    print(a)
+    print(validate_shape(a))
+
+    print("\nisolated shape")
+    a = np.array([[0,0,0,0,0],
+                  [0,1,1,1,0],
+                  [0,0,0,0,0],
+                  [0,0,1,0,0],
+                  [0,0,0,0,0]])
+    print(a)
+    print(validate_shape(a))
+
+def encode_shape_test():
+    print("\n\nTEST: Encode shapes")
+    print("\n small square")
+    a = np.array([[0,0,0,0],
+                  [0,1,1,0],
+                  [0,1,1,0],
+                  [0,0,0,0],])
+    print(a)
+    print(encode_shape(a))
+
+    print("\n hollow square")
+    a = np.array([[0,0,0,0,0,0],
+                  [0,1,1,1,1,0],
+                  [0,1,0,0,1,0],
+                  [0,1,0,0,1,0],
+                  [0,1,1,1,1,0],
+                  [0,0,0,0,0,0],])
+    print(a)
+    print(encode_shape(a))
+
+
+def create_shape_test():
+    print("\n\nTEST: Create shapes from encodings")
+
+    a = "4,4,4,-5,2,-2,2,-5"
+    print(a)
+    print(create_shape(a))
+
+def involved_encoding_test():
+    print("\n\nTEST: Decode then re-encode shapes")
+
+    print("\nSimple encoding, to shape, back to encoding")
+    a = "4,4,4,-5,2,-2,2,-5"
+    print(a)
+    print(create_shape(a))
+    b = encode_shape(create_shape(a))
+    print(b)
+    print(b == a)
+
+    print("\nLarge encoding, to shape, back to encoding")
+    a = "10,5,5,-5,7,-5,3,-5"
+    print(a)
+    print(create_shape(a))
+    b = encode_shape(create_shape(a))
+    print(b)
+    print(b == a)
+
+    print("\nLarge shape, to encoding, back to shape")
+    a = np.array([[0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],
+                  [1,1,0,0,0,1,0,0],
+                  [0,1,0,1,1,1,0,0],
+                  [0,1,1,1,0,0,0,0],
+                  [0,1,0,1,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],])
+    print(a)
+    print(encode_shape(a))
+    b = create_shape(encode_shape(a))
+    print(b)
+    print(b == a)
+
+
+def cull_test():
+    print("\n\nTEST: Cull 0-only edges from shapes")
+    
+    print("\n small square")
+    a = np.array([[0,0,0,0],
+                  [0,1,1,0],
+                  [0,1,1,0],
+                  [0,0,0,0],])
+    print(a)
+    b = cull(a)
+    print(b)
+    print(b.shape == (2,2))
+
+    print("\n hollow square")
+    a = np.array([[0,0,0,0,0,0],
+                  [0,1,1,1,1,0],
+                  [0,1,0,0,1,0],
+                  [0,1,0,0,1,0],
+                  [0,1,1,1,1,0],
+                  [0,0,0,0,0,0],])
+    print(a)
+    b = cull(a)
+    print(b)
+    print(b.shape == (4,4))
+    
+
+    print("\nLarge shape")
+    a = np.array([[0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],
+                  [1,1,0,0,0,1,0,0],
+                  [0,1,0,1,1,1,0,0],
+                  [0,1,1,1,0,0,0,0],
+                  [0,1,0,1,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],])
+    print(a)
+    b = cull(a)
+    print(b)
+    print(b.shape == (4,6))
+
+def generate_shell_test():
+    print("\n\nTEST: Shell Construction around shapes.")
+
+    print("\nSingle Cell shape")
+    a = np.array([[1]])
+    print(a)
+    b = generate_shell(a)
+    print(b)
+    print(b == np.array([[0,1,0],
+                         [1,0,1],
+                         [0,1,0],]))
+    
+    print("\nSmall shape")
+    a = np.array([[1,1],
+                  [1,1],])
+    print(a)
+    b = generate_shell(a)
+    print(b)
+    print(b == np.array([[0,1,1,0],
+                         [1,0,0,1],
+                         [1,0,0,1],
+                         [0,1,1,0],]))
+
+    print("\nLarge Shape")
+    a = np.array([[1,0,1,0],
+                  [1,1,1,1],
+                  [1,0,1,1],
+                  [0,1,0,0],])
+    print(a)
+    b = generate_shell(a)
+    print(b)
+    print(b == np.array([[0,1,0,1,0,0],
+                         [1,0,1,0,1,0],
+                         [1,0,0,0,0,1],
+                         [1,0,1,0,0,1],
+                         [0,1,0,1,1,0],
+                         [0,0,1,0,0,0],]))
+
+def get_n_from_encoding_test():
+    print("\n\nTEST: Get value of n from encoded shape")
+
+    print("\nSimple encoding")
+    a = "4,4,4,-5,2,-2,2,-5"
+    print(a)
+    b = a.split(",")[0]
+    print(b)
+    print(b == a)
+
+    print("\nLarge encoding, to shape, back to encoding")
+    a = "10,5,5,-5,7,-5,3,-5"
+    print(a)
+    b = a.split(",")[0]
+    print(b)
+    print(b == a)
+
+
+
+def get_n_from_shape_test():
+    print("\n\nTEST: Get value of `n` from enoding")
+    
+    print("\n small square")
+    a = np.array([[0,0,0,0],
+                  [0,1,1,0],
+                  [0,1,1,0],
+                  [0,0,0,0],])
+    print(a)
+    b = get_n_from_shape(a)
+    print(b)
+    print(b == 4)
+
+    print("\n hollow square")
+    a = np.array([[0,0,0,0,0,0],
+                  [0,1,1,1,1,0],
+                  [0,1,0,0,1,0],
+                  [0,1,0,0,1,0],
+                  [0,1,1,1,1,0],
+                  [0,0,0,0,0,0],])
+    print(a)
+    b = get_n_from_shape(a)
+    print(b)
+    print(b == 12)
+    
+
+    print("\nLarge shape")
+    a = np.array([[0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],
+                  [1,1,0,0,0,1,0,0],
+                  [0,1,0,1,1,1,0,0],
+                  [0,1,1,1,0,0,0,0],
+                  [0,1,0,1,0,0,0,0],
+                  [0,0,0,0,0,0,0,0],])
+    print(a)
+    b = get_n_from_shape(a)
+    print(b)
+    print(b.shape == 12)
+
+def generate_first_novel_shape_test():
+    print("\n\nTEST: Generate 'first' shape from an existing shape.")
+
+    print("\nSmall shape")
+    a = np.array([[1,1],
+                  [1,1],])
+    print(a)
+    b = generate_first_novel_shape(a)
+    print(b)
+    print(b == np.array([[1,0],
+                         [1,1],
+                         [1,1],]))
+
+    print("\nLarge Shape")
+    a = np.array([[1,0,1,0],
+                  [1,1,1,1],
+                  [1,0,1,1],
+                  [0,1,0,0],])
+    print(a)
+    b = generate_first_novel_shape(a)
+    print(b)
+    print(b == np.array([[1,0,0,0],
+                         [1,0,1,0],
+                         [1,1,1,1],
+                         [1,0,1,1],
+                         [0,1,0,0],]))
+
+def generate_all_after_first_novel_shape_test():
+        print("\n\nTEST: Shell Construction around shapes.")
+
+    print("\nSingle Cell shape")
+    a = np.array([[1]])
+    print(a)
+    c = generate_all_after_first_novel_shape(a)
+    for b in c:
+        print(b)
+    d =
+        np.array(([[1],
+                   [1]])),
+        np.array(([[1,1]]))
+        # Note, this should still find a vertical pair, but the original shape should be the top cell, not that we can easily know that.
+    for e in d
+        if (not e in c)
+        print("\n Below shape NOT found in output")
+        print(e)
+
+
+    
+    
+    print("\nSmall shape")
+    a = np.array([[1,1],
+                  [1,1],])
+    print(a)
+    c = generate_all_after_first_novel_shape(a)
+    for b in c:
+        print(b)
+    d =
+        np.array(([[1,1,1],
+                   [0,1,1],])),
+        np.array(([[0,1,1],
+                   [1,1,1],])),
+        np.array(([[1,1,1],
+                   [1,1,0],])),
+        np.array(([[1,1,0],
+                   [1,1,1],])),
+        # Should not find or search for 10
+        #                               11
+        #                               11
+        np.array(([[0,1],
+                   [1,1],
+                   [1,1],])),
+        np.array(([[1,1],
+                   [1,1],
+                   [1,0],])),
+        np.array(([[1,1],
+                   [1,1],
+                   [0,1],]))
+    for e in d
+        if (not e in c)
+        print("\n Below shape NOT found in output")
+        print(e)
+
+    f = np.array(([[0,1],
+                   [1,1],
+                   [1,1],])),
+    if f in c:
+        print("\nError: Located first shape in list when it should not have been present")
+
+#pad_test()
+#validate_shape_test()
+#encode_shape_test()
+#create_shape_test()
+#involved_encoding_test()
+#cull_test()
+#generate_shell_test()
+get_n_from_encoding_test()
+get_n_from_shape_test()
+generate_first_novel_shape_test()
+generate_all_after_first_novel_shape_test()
+        
+
+
