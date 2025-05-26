@@ -22,11 +22,6 @@ Rules:
 import numpy as np
 #print(np.__version__)
 
-'''
-current_shape = np.array([[1, 2, 3], [4, 5, 6]])
-print(current_shape.shape)
-'''
-
 def custom_pad(cur_shape):
     dims = cur_shape.shape
     if (len(dims) != 2):
@@ -80,7 +75,6 @@ def validate_shape(cur_shape):
                 
             
     return True      
-
 
 def encode_shape(cur_shape):
     out = "" + str(cur_shape.sum()) + ","
@@ -220,7 +214,7 @@ def get_n_from_encoding(encoding):
     else:
         return 0
 
-def generate_first_novel_shape(cur_shape):
+def generate_first_novel_encoding(cur_shape):
     dims = cur_shape.shape
     new_shape = custom_pad(np.copy((cur_shape)))
     flag = False
@@ -232,10 +226,32 @@ def generate_first_novel_shape(cur_shape):
                 flag = True
                 new_shape[i][j+1] = 1
                 break
-    return cull(new_shape)
+    return encode_shape(cull(new_shape))
 
-def generate_all_after_first_novel_shape(cur_shape, shell):
-    out # how to make a set?
+def generate_all_encodings_after_first(cur_shape, shell):
+    out = {}
+    to_make_count = shell.sum()
+    first_found = False
+    cur_shape = custom_pad(cur_shape)
+    dims = cur_shape.shape
+    if (dims != shell.shape):
+        print("Area reserved for shape and shell are different, implementation logic is broken")
+    for i in range(dims[0]):
+        for j in range(dims[1]):
+            if shell[i, j] == 1:
+                if first_found == False:
+                    first_found = True
+                    continue
+                else:
+                    new_shape = np.copy(cur_shape)
+                    new_shape[i, j] = 1
+                    out.add(encode_shape(cull(new_shape)))
+    return out
+
+def set_contains(set, elem):
+    return set.issubset({elem})
+
+
 
 
 
