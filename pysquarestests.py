@@ -1,31 +1,31 @@
 from pysquares import *
 import numpy as np
-def pad_test():
+def custom_pad_test():
     print("\n\nTEST: padding shapes\n")
     print("full")
     full_arr = np.array([[1, 2, 3], [4, 5, 6]])
-    padded_full_arr = pad(full_arr)
+    padded_full_arr = custom_pad(full_arr)
     print(full_arr)
     print(padded_full_arr)
     print("pad again")
-    double_padded_full_arr = pad(padded_full_arr)
+    double_padded_full_arr = custom_pad(padded_full_arr)
     print(double_padded_full_arr)
 
     print("\nempty")
     empty_arr = np.array([[0, 0, 0], [0, 0, 0]])
-    padded_empty_arr = pad(empty_arr)
+    padded_empty_arr = custom_pad(empty_arr)
     print(empty_arr)
     print(padded_empty_arr)
 
     print("\nsingle empty cell")
     a = np.array([[0]])
-    b = pad(a)
+    b = custom_pad(a)
     print(a)
     print(b)
 
     print("\nsingle full cell")
     a = np.array([[1]])
-    b = pad(a)
+    b = custom_pad(a)
     print(a)
     print(b)
 
@@ -208,18 +208,16 @@ def get_n_from_encoding_test():
     print("\nSimple encoding")
     a = "4,4,4,-5,2,-2,2,-5"
     print(a)
-    b = a.split(",")[0]
+    b = get_n_from_encoding(a)
     print(b)
-    print(b == a)
+    print(b == 4)
 
     print("\nLarge encoding, to shape, back to encoding")
     a = "10,5,5,-5,7,-5,3,-5"
     print(a)
-    b = a.split(",")[0]
+    b = get_n_from_encoding(a)
     print(b)
-    print(b == a)
-
-
+    print(b == 10)
 
 def get_n_from_shape_test():
     print("\n\nTEST: Get value of `n` from enoding")
@@ -241,9 +239,9 @@ def get_n_from_shape_test():
                   [0,1,0,0,1,0],
                   [0,1,1,1,1,0],
                   [0,0,0,0,0,0],])
-    print(a)
+    print("a is {}".format(a))
     b = get_n_from_shape(a)
-    print(b)
+    print("b is {}".format(b))
     print(b == 12)
     
 
@@ -256,10 +254,10 @@ def get_n_from_shape_test():
                   [0,1,1,1,0,0,0,0],
                   [0,1,0,1,0,0,0,0],
                   [0,0,0,0,0,0,0,0],])
-    print(a)
+    print("a is {}".format(a))
     b = get_n_from_shape(a)
-    print(b)
-    print(b.shape == 12)
+    print("b is {}".format(b))
+    print(b == 12)
 
 def generate_first_novel_shape_test():
     print("\n\nTEST: Generate 'first' shape from an existing shape.")
@@ -267,9 +265,9 @@ def generate_first_novel_shape_test():
     print("\nSmall shape")
     a = np.array([[1,1],
                   [1,1],])
-    print(a)
+    print("a is {}".format(a))
     b = generate_first_novel_shape(a)
-    print(b)
+    print("b is {}".format(b))
     print(b == np.array([[1,0],
                          [1,1],
                          [1,1],]))
@@ -279,9 +277,9 @@ def generate_first_novel_shape_test():
                   [1,1,1,1],
                   [1,0,1,1],
                   [0,1,0,0],])
-    print(a)
+    print("a is {}".format(a))
     b = generate_first_novel_shape(a)
-    print(b)
+    print("b is {}".format(b))
     print(b == np.array([[1,0,0,0],
                          [1,0,1,0],
                          [1,1,1,1],
@@ -289,26 +287,21 @@ def generate_first_novel_shape_test():
                          [0,1,0,0],]))
 
 def generate_all_after_first_novel_shape_test():
-        print("\n\nTEST: Shell Construction around shapes.")
-
+    print("\n\nTEST: Shell Construction around shapes.")
     print("\nSingle Cell shape")
     a = np.array([[1]])
     print(a)
-    c = generate_all_after_first_novel_shape(a)
+    c = generate_all_after_first_novel_shape(a, generate_shell(a))
     for b in c:
         print(b)
-    d =
-        np.array(([[1],
+    d = (np.array(([[1],
                    [1]])),
-        np.array(([[1,1]]))
+        np.array(([[1,1]])))
         # Note, this should still find a vertical pair, but the original shape should be the top cell, not that we can easily know that.
-    for e in d
-        if (not e in c)
-        print("\n Below shape NOT found in output")
-        print(e)
-
-
-    
+    for e in d:
+        if (not e in c):
+            print("\n Below shape NOT found in output")
+            print(e)  
     
     print("\nSmall shape")
     a = np.array([[1,1],
@@ -317,31 +310,12 @@ def generate_all_after_first_novel_shape_test():
     c = generate_all_after_first_novel_shape(a)
     for b in c:
         print(b)
-    d =
-        np.array(([[1,1,1],
-                   [0,1,1],])),
-        np.array(([[0,1,1],
-                   [1,1,1],])),
-        np.array(([[1,1,1],
-                   [1,1,0],])),
-        np.array(([[1,1,0],
-                   [1,1,1],])),
-        # Should not find or search for 10
-        #                               11
-        #                               11
-        np.array(([[0,1],
-                   [1,1],
-                   [1,1],])),
-        np.array(([[1,1],
-                   [1,1],
-                   [1,0],])),
-        np.array(([[1,1],
-                   [1,1],
-                   [0,1],]))
-    for e in d
-        if (not e in c)
-        print("\n Below shape NOT found in output")
-        print(e)
+    d = np.array(([[1,1,1],[0,1,1],])), np.array(([[0,1,1],[1,1,1],])), np.array(([[1,1,1],[1,1,0],])), np.array(([[1,1,0],[1,1,1],])),
+    np.array(([[0,1],[1,1],[1,1],])),np.array(([[1,1],[1,1],[1,0],])),np.array(([[1,1],[1,1],[0,1],]))
+    for e in d:
+        if not e in c:
+            print("\n Below shape NOT found in output")
+            print(e)
 
     f = np.array(([[0,1],
                    [1,1],
@@ -349,16 +323,16 @@ def generate_all_after_first_novel_shape_test():
     if f in c:
         print("\nError: Located first shape in list when it should not have been present")
 
-#pad_test()
+#custom_pad_test()
 #validate_shape_test()
 #encode_shape_test()
 #create_shape_test()
 #involved_encoding_test()
 #cull_test()
 #generate_shell_test()
-get_n_from_encoding_test()
-get_n_from_shape_test()
-generate_first_novel_shape_test()
+#get_n_from_encoding_test()
+#get_n_from_shape_test()
+#generate_first_novel_shape_test()
 generate_all_after_first_novel_shape_test()
         
 

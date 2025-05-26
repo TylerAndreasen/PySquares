@@ -27,7 +27,7 @@ current_shape = np.array([[1, 2, 3], [4, 5, 6]])
 print(current_shape.shape)
 '''
 
-def pad(cur_shape):
+def custom_pad(cur_shape):
     dims = cur_shape.shape
     if (len(dims) != 2):
         print("Attempted to pad a shape of size {}".format(dims))
@@ -173,7 +173,7 @@ def cull(cur_shape):
         return cur_shape
         
 def generate_shell(cur_shape):
-    cur_shape = pad(cull(cur_shape))
+    cur_shape = custom_pad(cull(cur_shape))
     dims = cur_shape.shape
     shell = np.zeros((dims[0],dims[1]), dtype=int)
 
@@ -206,29 +206,36 @@ def generate_shell(cur_shape):
                     pass
                 else:
                     shell[i+1][j] = 1
-    return shell
-                
+    return shell         
 
 def get_n_from_shape(cur_shape):
-    pass
+    return cur_shape.sum()
 
 def get_n_from_encoding(encoding):
     if len(encoding) < 1:
         return 0
     a = encoding.split(",")
-    if (isdecimal(a[0]):
+    if (a[0].isdecimal()):
         return int(a[0])
     else:
         return 0
 
-def get_dims_from_shape(cur_shape):
-    pass
-
 def generate_first_novel_shape(cur_shape):
-    pass
+    dims = cur_shape.shape
+    new_shape = custom_pad(np.copy((cur_shape)))
+    flag = False
+    for i in range(dims[0]):
+        if flag:
+            break
+        for j in range(dims[1]):
+            if cur_shape[i][j] == 1:
+                flag = True
+                new_shape[i][j+1] = 1
+                break
+    return cull(new_shape)
 
 def generate_all_after_first_novel_shape(cur_shape, shell):
-    pass
+    out # how to make a set?
 
 
 
