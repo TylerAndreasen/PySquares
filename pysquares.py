@@ -41,7 +41,7 @@ def custom_pad(cur_shape):
             cur_shape = np.pad(cur_shape, (horiz, vert), 'constant', constant_values=(0))
         return cur_shape
 
-
+# Will depreciate
 def is_empty_shape(cur_shape):
     if (cur_shape.sum() > 0):
         return False
@@ -51,7 +51,6 @@ def is_empty_shape(cur_shape):
             if (cur_shape[i][j] > 0):
                 return False
     return True
-
 
 def validate_shape(cur_shape):
     count = cur_shape.sum()
@@ -81,8 +80,8 @@ def encode_shape(cur_shape):
     dims = cur_shape.shape
     out += str(dims[0]) + "," + str(dims[1])+","
     counter = 0
-    for i in range(dims[1]):
-        for j in range(dims[0]):
+    for i in range(dims[0]):
+        for j in range(dims[1]):
             if (cur_shape[i][j] == 0):
                 if (counter < 1):
                     counter -= 1
@@ -123,7 +122,7 @@ def create_shape(encoded):
     return new_shape
 
 def cull(cur_shape):
-    if (is_empty_shape(cur_shape)):
+    if (np.all(cur_shape == 0)):
         return np.zeros((1,1))
     top = 0
     right = 0
