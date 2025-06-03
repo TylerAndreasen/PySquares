@@ -81,7 +81,6 @@ def encode_shape_test():
     print(a)
     print(encode_shape(a))
 
-
 def create_shape_test():
     print("\n\nTEST: Create shapes from encodings")
 
@@ -281,14 +280,14 @@ def generate_first_novel_encoding_test():
     print(b == "11,5,4,1,-3,1,-1,1,-1,5,-1,2,-1,1,-2")
 
 def generate_all_encodings_after_first_test():
-    print("\n\nTEST: Shell Construction around shapes.")
+    print("\n\nTEST: Generates encodings of shapes from shell, excludes first shape.")
     print("\nSingle Cell shape")
     a = np.array([[1]])
     print(a)
     c = generate_all_encodings_after_first(a, generate_shell(a))
     for b in c:
         print(b)
-    d = ("2,1,2,2", "2,2,1,2")
+    d = set(["2,1,2,2", "2,2,1,2"])
         # Note, this should still find a vertical pair, but the original shape should be the top cell, not that we can easily know that.
     for e in d:
         if (not e in c):
@@ -299,25 +298,17 @@ def generate_all_encodings_after_first_test():
     a = np.array([[1,1],
                   [1,1],])
     print(a)
-    c = generate_all_encodings_after_first(a)
+    c = generate_all_encodings_after_first(a, generate_shell(a))
     for b in c:
         print(b)
-    d = ("5,3,2,")
-    np.array(([[1,1,1],[0,1,1],])),
-    np.array(([[0,1,1],[1,1,1],])),
-    np.array(([[1,1,1],[1,1,0],])),
-    np.array(([[1,1,0],[1,1,1],])),
-    np.array(([[0,1],[1,1],[1,1],])),
-    np.array(([[1,1],[1,1],[1,0],])),
-    np.array(([[1,1],[1,1],[0,1],]))
+    d = set(["5,2,3,3,-1,2","5,2,3,-1,5","5,2,3,5,-1","5,2,3,2,-1,3","5,3,2,-1,5","5,3,2,5,-1","5,3,2,4,-1,1"])
+
     for e in d:
         if not e in c:
             print("\n Below shape NOT found in output")
             print(e)
 
-    f = np.array(([[0,1],
-                   [1,1],
-                   [1,1],])),
+    f = "5,3,2,1,-1,4"
     if f in c:
         print("\nError: Located first shape in list when it should not have been present")
 
@@ -331,4 +322,4 @@ def generate_all_encodings_after_first_test():
 #get_n_from_encoding_test()
 #get_n_from_shape_test()
 #generate_first_novel_encoding_test()
-#generate_all_after_first_novel_shape_test()
+#generate_all_encodings_after_first_test()

@@ -228,13 +228,18 @@ def generate_first_novel_encoding(cur_shape):
     return encode_shape(cull(new_shape))
 
 def generate_all_encodings_after_first(cur_shape, shell):
-    out = {}
+    out = set()
     to_make_count = shell.sum()
     first_found = False
     cur_shape = custom_pad(cur_shape)
     dims = cur_shape.shape
     if (dims != shell.shape):
         print("Area reserved for shape and shell are different, implementation logic is broken")
+
+    # TODO The logic of the below is sound, but does not account for rotations and reflections.
+    #       It will behoove me to take a step back, think through how to write a series of steps that will effeciently generate rotations and reflections
+    #       Further, doing some research about where it is most effecient to try to test for repetition.
+
     for i in range(dims[0]):
         for j in range(dims[1]):
             if shell[i, j] == 1:
@@ -251,32 +256,60 @@ def set_contains(set, elem):
     return set.issubset({elem})
 
 
+if __name__ == "__main__":
+    
+    n = 0
+    # Ask for user input
+    while True:
+        print("How many squares to include in free polyomino generation, called `n`: ")
+        temp = input().strip()
+        if not temp.isdecimal():
+            print("Please enter a number.\n\n")
+            continue
+        temp = int(temp)
+        if temp < 1:
+            print("Please enter a value of at least 1 square to generate into shapes.")
+            continue
+        n = temp
+        if n > 64:
+            print("If you wish to know the answer to the number of shapes made with n squares,")
+            print("You should likely not be running Python that you found on the internet")
+            print("As the code will not be nearly effecient enough to complete in anything short of geologic time scales")
+            print("on the hardware available to the original developeron the hardware available to the original developer")
+            print("The developer advises you to stop the program and find a more effecient menas of calculating.")
+            print("If you continue, you have been warned, don't expect to see the final answer in your lifetime.")
+        elif n > 27:
+            print("As of writing this program, humans have not calculated beyond 27 squares.")
+            print("You are unlikely to reach the end of this program quickly.")
+        break
+    
+    if n < 3:
+        print("There exists only 1 polyonimo with {} square(s)".format(n))
+    else:
+        init = np.ones((2,1))
 
+        small_shapes = set([init])
 
+        large_shape_encodings = set([])
 
-                    
-#print(current_shape[0])
+        m = 2
+        while m < n:
+            print("Shapes of size {}".format(m) + "are counted to be {}.".format(len(small_shapes)))
 
+            for shape in small_shapes:
+                fne = generate_first_novel_encoding(shape)
+                if (set_contains(large_shape_encodings, fne)):
+                    continue # Don't bother generating anything else
+                else: # We can legally add the fne to the set
+                    shell = generate_shell(shape)
 
+                    shelled_shapes = g
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    novel_encodings = generate_all_encodings_after_first()
+            #END FOR
+        # END WHILE
+    # END ELSE
+    print("Thank you for your work in recreational mathematics")
 
 
 
