@@ -122,7 +122,6 @@ def involved_encoding_test():
     print(b)
     print(b == a)
 
-
 def cull_test():
     print("\n\nTEST: Cull 0-only edges from shapes")
     

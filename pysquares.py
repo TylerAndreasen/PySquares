@@ -253,7 +253,7 @@ def generate_all_encodings_after_first(cur_shape, shell):
     return out
 
 def set_contains(set, elem):
-    return set.issubset({elem})
+    return {elem}.issubset(set)
 
 
 if __name__ == "__main__":
@@ -275,8 +275,8 @@ if __name__ == "__main__":
             print("If you wish to know the answer to the number of shapes made with n squares,")
             print("You should likely not be running Python that you found on the internet")
             print("As the code will not be nearly effecient enough to complete in anything short of geologic time scales")
-            print("on the hardware available to the original developeron the hardware available to the original developer")
-            print("The developer advises you to stop the program and find a more effecient menas of calculating.")
+            print("on the hardware available to the original developer.")
+            print("The developer advises you to stop the program and find a more effecient means of calculating.")
             print("If you continue, you have been warned, don't expect to see the final answer in your lifetime.")
         elif n > 27:
             print("As of writing this program, humans have not calculated beyond 27 squares.")
@@ -288,7 +288,7 @@ if __name__ == "__main__":
     else:
         init = np.ones((2,1))
 
-        small_shapes = set([init])
+        small_shapes = [init]
 
         large_shape_encodings = set([])
 
@@ -303,10 +303,25 @@ if __name__ == "__main__":
                 else: # We can legally add the fne to the set
                     shell = generate_shell(shape)
 
-                    shelled_shapes = g
+                    remaining_novel_shapes = generate_all_encodings_after_first(shape, shell)
 
-                    novel_encodings = generate_all_encodings_after_first()
+                    add_flag = True
+                    for novel_shape in remaining_novel_shapes:
+                        if ({novel_shape}.issubset(large_shape_encodings)):
+                            add_flag = False
+                            break
+                    if add_flag:
+                        large_shape_encodings.add(fne)
             #END FOR
+            if m == n:
+                print("There are {} polyonimos of size {}".format(len(large_shape_encodings), n))
+                break
+            else:
+                small_shapes = ()
+                for encoding in large_shape_encodings:
+                    small_shapes.add(create_shape(encoding))
+                large_shape_encodings.empty()
+                m += 1
         # END WHILE
     # END ELSE
     print("Thank you for your work in recreational mathematics")
