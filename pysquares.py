@@ -19,6 +19,9 @@ Rules:
 
 '''
 
+import os.path
+from pathlib import Path
+import time
 import numpy as np
 #print(np.__version__)
 
@@ -135,7 +138,7 @@ def encode_shape(cur_shape):
     out += str(counter)
     return out
 
-def valid_encoding(encoded):
+def valid_encoding(encoded, intended_size=0):
     """Validates a String encoding of a polyomino is correct.
     
     For a description of the rules that create encodings, see docs for
@@ -153,12 +156,12 @@ def valid_encoding(encoded):
     numbers = encoded.split(",")
     if (len(numbers) < 4):
         return False
-    if (numbers[0] > numbers[1]*numbers[2]):
+    if (int(numbers[0])) > int(numbers[1])*int(numbers[2]):
         return False
     cell_count = 0
     area = 0
-    for num in numbers:
-        check = int(num)
+    for i in range(3,len(numbers)):
+        check = int(numbers[i])
         if check == 0:
             return False
         if check > 0:
@@ -167,11 +170,15 @@ def valid_encoding(encoded):
         else:
             area += abs(check)
     
-    if (cell_count != numbers[0]):
+    if (cell_count != int(numbers[0])):
         return False
     
-    if (area != numbers[1]*numbers[2]):
+    if (area != int(numbers[1])*int(numbers[2])):
         return False
+    
+    if (intended_size != None and intended_size > 2):
+        if (intended_size  != int(numbers[0])):
+            return False
     #TODO Implement commandline param that control if all used/generated encodings are validated before being used
     return True
 
@@ -430,6 +437,34 @@ def set_contains(set, elem):
     """Determines if a single element is a subset of a set."""
     return {elem}.issubset(set)
 
+def final_message(n, encode_count, start_time=0, jumping_point=0):
+    if start_time == 0:
+        print("A local file states that there are {} polyonimos of size {}".format(encode_count, n))
+    elif jumping_point > 2:
+        print("Starting from size {} polyominos, calculated that there are {} polyonimos of size {} in {} seconds".format(jumping_point, encode_count, n, abs(start_time-time.time())))
+    else:
+        print("Calculated that there are {} polyonimos of size {} in {} seconds".format(encode_count, n, abs(start_time-time.time())))
+
+def set_from_filename(path):
+    if not path.is_file():
+        return set()
+    else:
+        out = set()
+        file = open(path, "r", encoding="utf-8")
+        for line in file:
+            out.add(line)
+        return out
+
+def generate_file_name_from_n(n):
+    return "encoding"+str(n)+".txt"
+
+def write_encodings_to_file(file_path, set):
+    file = open(file_path, "w", encoding="utf-8")
+    for encoding in set:
+        file.write(encoding+"\n")
+    file.flush()
+    file.close()
+
 if __name__ == "__main__":
     
     n = 0
@@ -452,12 +487,12 @@ if __name__ == "__main__":
         n = temp
         if n > 64:
             print("If you wish to know the answer to the number of shapes made with n squares,")
-            print("You should likely not be running Python that you found on the internet")
+            print("You should 5not be running Python that you found on the internet")
             print("As the code will not be nearly effecient enough to complete in anything short of geologic time scales")
             print("on the hardware available to the original developer.")
             print("The developer advises you to stop the program and find a more effecient means of calculating.")
             print("If you continue, you have been warned, don't expect to see the final answer in your lifetime.")
-        elif n > 27:
+        elif n > 28:
             print("As of writing this program, humans have not calculated beyond 27 squares.")
             print("You are unlikely to reach the end of this program quickly.")
         break
@@ -465,16 +500,63 @@ if __name__ == "__main__":
     if n < 3:
         print("There exists only 1 polyonimo with {} square(s)".format(n))
     else:
-        init = np.ones((2,1), dtype=int) # dtype=int ??
-        small_shape_encodings = ([encode_shape(init)])
 
-        large_shape_encodings = set([])
 
+        file_path = None
+        small_shape_encodings = set()
+        index = None
+        found_file_for_n = False
+        for i in range(n,2,-1):
+            file_path = Path(generate_file_name_from_n(i))
+            if file_path.exists():
+                if n == i:
+                    found_file_for_n = True
+                index = i
+                break
+            else:
+                file_path = None
+
+        if file_path == None:
+            small_shape_encodings = set([encode_shape(np.ones((2,1), dtype=int))])
+        else:
+            small_shape_encodings = set_from_filename(file_path)
+            if found_file_for_n:
+                # Found the file that stores the n we are looking for
+                final_message(n, len(small_shape_encodings))
+                exit(0)
+
+        
+        # Validate that encodings are correct
+        random_encoding = small_shape_encodings.pop()
+        intended_size = None
+        if index != None:
+            intended_size = index
+        
+        if found_file_for_n:
+            intended_size = n
+        
+        if not valid_encoding(random_encoding, intended_size):
+            print("Logic Error: Looking for shapes of size {}, got shapes of {}".format(intended_size, get_n_from_encoding(random_encoding)))
+            exit(1)
+        small_shape_encodings.add(random_encoding)
+
+
+        large_shape_encodings = set()
+        start_time = time.time()
         m = 2
+        if index != None and index > 2:
+            m = index
+
         while m <= n:
             #print("Shapes of size {}".format(m) + " are counted to be {}.".format(len(small_shape_encodings))) # of size len(small_shapes)
-
+            one_thousand_counter = -1
+            bigger_counter = 0
             for shape_encoding in small_shape_encodings:
+                one_thousand_counter += 1
+                if one_thousand_counter == 1000:
+                    one_thousand_counter = 0
+                    bigger_counter += 1
+                    print("Calculated shapes of size {}, from {} thousand shapes of size {}.".format(m+1, bigger_counter, m))
                 shape = create_shape(shape_encoding)
                 shell = generate_shell(shape)
                 shape = custom_pad(shape)
@@ -494,20 +576,27 @@ if __name__ == "__main__":
                                 large_shape_encodings.add(rnr.pop())
             #END FOR
             if m == n-1:
-                print("There are {} polyonimos of size {}".format(len(large_shape_encodings), n))
-
-                #for encoding in large_shape_encodings:
-                #    print(create_shape(encoding))
-                #    print()
+                write_encodings_to_file(Path(generate_file_name_from_n(n)), large_shape_encodings)
+                if index == None:
+                    final_message(n, len(large_shape_encodings), start_time)
+                elif index > 2:
+                    final_message(n, len(large_shape_encodings), start_time, index)
+                else:
+                    final_message(n, len(large_shape_encodings), start_time)
+                    
                 break
             else:
-                small_shape_encodings = large_shape_encodings
+                small_shape_encodings = set()
+                write_encodings_to_file(Path(generate_file_name_from_n(m+1)), large_shape_encodings)
+                for encoding in large_shape_encodings:
+                    small_shape_encodings.add(encoding)
                 large_shape_encodings = set()
                 m += 1
         # END WHILE
     # END ELSE
 
     print("Thank you for your work in recreational mathematics")
+
 
 
 
